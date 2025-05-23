@@ -8,7 +8,6 @@ class SnippetSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'code', 'linenos',]
 
 
-
 """
 class SnippetSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
