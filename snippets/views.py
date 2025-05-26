@@ -1,16 +1,31 @@
-from snippets.models import Snippet
-from snippets.serializers import SnippetSerializer
 from rest_framework import generics
+from rest_framework import permissions
+from rest_framework import viewsets
+from snippets.permissions import IsOwnerOrReadOnly
+from snippets.models import Snippet
+from django.contrib.auth.models import User
+from snippets.serializers import SnippetSerializer
+from snippets.serializers import UserSerializer
 
 
 class SnippetList(generics.ListCreateAPIView):
     queryset = Snippet.objects.all()
     serializer_class = SnippetSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
 
 
 class SnippetDetail(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
     queryset = Snippet.objects.all()
     serializer_class = SnippetSerializer
+
+class UserViewSet(viewsets.ReadOnlyModelViewSet):
+    """ This viewset automatically provides `list` and `retrieve` actions. """
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
 
 
 """ Using Mixins and Generics
